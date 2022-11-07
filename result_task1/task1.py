@@ -5,6 +5,17 @@ graphCR = []
 
 # graph attributes d0-d3
 
+
+class Graph:
+
+    def __init__(self,edgedefault):
+
+        self.edgedefault= edgedefault   #differents graph attributes d0-d3
+        self.created_date=""
+        self.created_with=""
+        self.crs=""
+        self.simplified=""
+
 class Nodes:
 
     def __init__( self,id ):
@@ -43,6 +54,7 @@ class Edges:
 class Handler(xml.sax.ContentHandler):
     
     def _init_(self):
+        self.graph=""
         self.node=""
         self.edge=""
         self.data=""
@@ -52,8 +64,10 @@ class Handler(xml.sax.ContentHandler):
     def startElement(self, tag, attrs):
 
         self.CurrentData=tag
-
-        if tag=="node":      #indicates which node is being parsed
+        if tag=="graph":
+            self.graph=Graph(attrs["edgedefault"])
+            print ("Graph: ",self.graph.edgedefault)
+        elif tag=="node":      #indicates which node is being parsed
             self.node=Nodes(attrs["id"])
         
         elif tag=="edge":      #indicates which edge is being parsed
@@ -70,9 +84,19 @@ class Handler(xml.sax.ContentHandler):
     def endElement(self, name):
         if self.CurrentData=="data":
 
-        
+            #graph data
+            if self.DataKey=="d0":
+                self.graph.created_date=self.data
+                print("Created date: ",self.graph.created_date)
+            elif self.DataKey=="d1":
+                self.graph.created_with=self.data
+                print("Created with: ", self.graph.created_with)
+            elif self.DataKey=="d2":
+                self.graph.crs=self.data
+            elif self.DataKey=="d3":
+                self.graph.simplified=self.data
             #node data
-            if self.DataKey=="d4":
+            elif self.DataKey=="d4":
                 self.node.osmid_original=self.data
             elif self.DataKey=="d5":
                 self.node.y=self.data
