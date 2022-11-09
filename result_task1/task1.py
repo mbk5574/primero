@@ -6,7 +6,6 @@ graphCR = []
 nodos = []
 list_graph_CR = SortedDict()
 
-# graph attributes d0-d3
 
 class Nodes:
 
@@ -46,7 +45,7 @@ class Edges:
 
 class Handler(xml.sax.ContentHandler):
     
-    def _init_(self):
+    def __init__(self):
         self.node=""
         self.edge=""
         self.data=""
@@ -62,7 +61,6 @@ class Handler(xml.sax.ContentHandler):
         
         elif tag=="edge":      #indicates which edge is being parsed
             self.edge=Edges((attrs["source"]),(attrs["target"]))
-            #print ("Edge: -Source[",self.edge.source,"] -> Target[",self.edge.target,"]")
 
         elif tag=="data":       #for parsing the data
             self.DataKey=attrs["key"]
@@ -129,7 +127,7 @@ class Handler(xml.sax.ContentHandler):
             nodos.append([self.node])
         elif name=="edge": 
 
-            a = SortedList()
+            a = SortedList()        #adding edges to the sorted list
             if self.edge.source in list_graph_CR:
                 a = list_graph_CR.get(self.edge.source)
                 a.add(self.edge.target)
@@ -140,7 +138,7 @@ class Handler(xml.sax.ContentHandler):
     
         self.CurrentData=""
     
-class grafo:
+class graph:
 
     graf = ""
     nodos = ""
@@ -156,4 +154,7 @@ class grafo:
         parser.setContentHandler(HANDLER) #setting the content handler
         parser.parse("graph.xml") #xml where graph is described
 
-   
+
+
+g=graph()
+print(g.adyacencia)
