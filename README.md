@@ -3,4 +3,3 @@ lab-lab-si-1 created by GitHub Classroom
 
 Repositorio para las prácticas de Sistemas inteligentes.
 
-- Tarea 1 finalizada
