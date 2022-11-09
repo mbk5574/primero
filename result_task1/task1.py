@@ -1,20 +1,12 @@
 #!/usr/bin/python
 import xml.sax
+from sortedcontainers import *
 
 graphCR = []
+nodos = []
+list_graph_CR = SortedDict()
 
 # graph attributes d0-d3
-
-
-class Graph:
-
-    def __init__(self,edgedefault):
-
-        self.edgedefault= edgedefault   #differents graph attributes d0-d3
-        self.created_date=""
-        self.created_with=""
-        self.crs=""
-        self.simplified=""
 
 class Nodes:
 
@@ -28,6 +20,7 @@ class Nodes:
         self.latitude=""
         self.ref=""
         self.highway=""
+        
 
 class Edges:
 
@@ -54,7 +47,6 @@ class Edges:
 class Handler(xml.sax.ContentHandler):
     
     def _init_(self):
-        self.graph=""
         self.node=""
         self.edge=""
         self.data=""
@@ -64,15 +56,13 @@ class Handler(xml.sax.ContentHandler):
     def startElement(self, tag, attrs):
 
         self.CurrentData=tag
-        if tag=="graph":
-            self.graph=Graph(attrs["edgedefault"])
-            print ("Graph: ",self.graph.edgedefault)
-        elif tag=="node":      #indicates which node is being parsed
+
+        if tag=="node":      #indicates which node is being parsed
             self.node=Nodes(attrs["id"])
         
         elif tag=="edge":      #indicates which edge is being parsed
             self.edge=Edges((attrs["source"]),(attrs["target"]))
-            print ("Edge: -Source[",self.edge.source,"] -> Target[",self.edge.target,"]")
+            #print ("Edge: -Source[",self.edge.source,"] -> Target[",self.edge.target,"]")
 
         elif tag=="data":       #for parsing the data
             self.DataKey=attrs["key"]
@@ -83,20 +73,9 @@ class Handler(xml.sax.ContentHandler):
 
     def endElement(self, name):
         if self.CurrentData=="data":
-
-            #graph data
-            if self.DataKey=="d0":
-                self.graph.created_date=self.data
-                print("Created date: ",self.graph.created_date)
-            elif self.DataKey=="d1":
-                self.graph.created_with=self.data
-                print("Created with: ", self.graph.created_with)
-            elif self.DataKey=="d2":
-                self.graph.crs=self.data
-            elif self.DataKey=="d3":
-                self.graph.simplified=self.data
+                
             #node data
-            elif self.DataKey=="d4":
+            if self.DataKey=="d4":
                 self.node.osmid_original=self.data
             elif self.DataKey=="d5":
                 self.node.y=self.data
@@ -147,20 +126,34 @@ class Handler(xml.sax.ContentHandler):
                 self.edge.tunnel=self.data
             
         elif name=="node":
-            graphCR.append([self.node])
-        elif name=="edge":
-            graphCR.append([self.edge.source,self.edge.target])
+            nodos.append([self.node])
+        elif name=="edge": 
+
+            a = SortedList()
+            if self.edge.source in list_graph_CR:
+                a = list_graph_CR.get(self.edge.source)
+                a.add(self.edge.target)
+                list_graph_CR.setdefault(self.edge.source, a)
+            else:
+                a.add(self.edge.target)
+                list_graph_CR[self.edge.source] = a
+    
         self.CurrentData=""
     
-HANDLER = Handler()
-parser=xml.sax.make_parser() #reader of xml
-parser.setContentHandler(HANDLER) #setting the content handler
-parser.parse("graph.xml") #xml where graph is described
+class grafo:
 
+    graf = ""
+    nodos = ""
+    adyacencia = ""
 
+    def __init__(self):
 
+        self.graf= graphCR
+        self.nodos = nodos
+        self.adyacencia = list_graph_CR
+        HANDLER = Handler()
+        parser=xml.sax.make_parser() #reader of xml
+        parser.setContentHandler(HANDLER) #setting the content handler
+        parser.parse("graph.xml") #xml where graph is described
 
-
-            
-            
-
+   
