@@ -155,6 +155,5 @@ class graph:
         parser.parse("graph.xml") #xml where graph is described
 
 
-
 g=graph()
 print(g.adyacencia)
