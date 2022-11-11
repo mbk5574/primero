@@ -143,18 +143,16 @@ class Handler(xml.sax.ContentHandler):
     
 class graph:
 
-    
-
     def __init__(self):
 
         self.graf= graphCR
         self.nodos = nodos
         self.adyacencia = list_graph_CR
+        
+    def iniciar_grafo(self):
         HANDLER = Handler()
         parser=xml.sax.make_parser() #reader of xml
         parser.setContentHandler(HANDLER) #setting the content handler
         parser.parse("graph.xml") #xml where graph is described
-
-
 
 
