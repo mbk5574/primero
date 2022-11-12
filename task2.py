@@ -12,34 +12,26 @@ class estado:
         self.graf = graf
         self.adyacencia = graf.adyacencia
         self.nodos_no_visitados = graf.nodos
-        self.nodos_visitado = []
         self.lista_objetivos = lista_objetivos
         self.current_nodo = current_nodo
         self.nuevo_estado = []
-
+        self.id = ""
+        
 def sucesor(e):
-    
-    adyacentes = SortedList()
-    adyacentes = e.adyacencia.get(e.current_nodo)
+    if len(e.lista_objetivos) == 0:
+        return
+    if e.current_nodo in e.graf.nodos_visitado:
+        return
 
-    for adyacente in adyacentes:
-        if adyacente in e.nodos_visitado:
-            next
-        e.lista_objetivos.append(adyacente)
-        if adyacente in e.lista_objetivos:
-            e.lista_objetivos.remove(adyacente)
-            
-        print("(",e.current_nodo,"->", adyacente, ",(", adyacente, e.lista_objetivos, ")")
-        e2 = estado(g, adyacente, e.lista_objetivos)
-        e.nuevo_estado.append(e2)
-        if len(e.lista_objetivos) != 0:
-            sucesor(e2)
-    
-
-
+    cadena = "(" + str(e.current_nodo) + "->" + "str(adyacente)" + ",(" + "str(adyacente)" + str(e.lista_objetivos) + ")"
+    print(cadena)
+       
+    e.id = hashlib.md5(cadena.encode('utf-8')).hexdigest()
+    print(e.id)
 
 current_nodo='0'
-lista_objetivos = ['5','27','881','1200']
+
+lista_objetivos = SortedList(['33', '1200'])
 
 e = estado(g, current_nodo, lista_objetivos)
 

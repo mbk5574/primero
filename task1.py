@@ -148,6 +148,7 @@ class graph:
         self.graf= graphCR
         self.nodos = nodos
         self.adyacencia = list_graph_CR
+        self.nodos_visitado = []
         
     def iniciar_grafo(self):
         HANDLER = Handler()
@@ -155,4 +156,5 @@ class graph:
         parser.setContentHandler(HANDLER) #setting the content handler
         parser.parse("graph.xml") #xml where graph is described
 
-
+    def reiniciar(self):
+        self.nodos_visitado.clear()
