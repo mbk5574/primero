@@ -23,16 +23,21 @@ def sucesor(e):
     if e.current_nodo in e.graf.nodos_visitado:
         return
 
-    cadena = "(" + str(e.current_nodo) + "->" + "str(adyacente)" + ",(" + "str(adyacente)" + str(e.lista_objetivos) + ")"
-    print(cadena)
-       
+    adyacentes= SortedList()
+    adyacentes = e.adyacencia.get(str(e.current_nodo))
+
+    for adyacente in adyacentes:
+        cadena = "(" + str(e.current_nodo) + "->" + str(adyacente) + ",(" + str(adyacente) + "," + str(e.lista_objetivos) + ")"
+        print(cadena)  
+
     e.id = hashlib.md5(cadena.encode('utf-8')).hexdigest()
     print(e.id)
+
 
 current_nodo='0'
 
 lista_objetivos = SortedList(['33', '1200'])
-
+print("(" + current_nodo + "," + str(lista_objetivos) + ")")
 e = estado(g, current_nodo, lista_objetivos)
 
 sucesor(e)
