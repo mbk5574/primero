@@ -4,40 +4,30 @@ import hashlib
 
 g = task1.graph()
 g.iniciar_grafo()
+lista_nodos = g.lista_nodos
 
-def sucesor(e):
-    if len(e.lista_objetivos) == 0:
-        return
-    if e.current_nodo in e.graf.nodos_visitado:
-        return
 
-    adyacentes= SortedList()
-    adyacentes = e.adyacencia.get(str(e.current_nodo))
+class frontera:
+
+    def __init__(self):
+        self.nodos = []
+
+class nodo:
+
+    def __init__(self):
+        self.id += 1
+        self.padre = nodo()
+        self.estado = task2.estado()
+        self.valor = ""
+        self.profundidad = ""
+        self.costo = ""
+        self.heuristica = ""
+        self.accion = ""
     
-    e.graf.nodos_visitado.append(e.current_nodo)
+    def camino(self):
+        pass
 
-    for adyacente in adyacentes:
-            
-        
-        if adyacente in e.lista_objetivos:
-            e.lista_objetivos.remove(adyacente)
+    def toString(self):
+        return("[" + self.id) + "][" + self.costo + "," + self.estado.id + "," + self.padre.id + "," + self.accion + "," + self.profundidad + "," + self.heuristica + "," + self.valor + "]"
 
-        cadena = "(" + str(e.current_nodo) + "->" + str(adyacente) + ",(" + str(adyacente) + "," + str(e.lista_objetivos) + ")"
-        
-        if len(e.lista_objetivos) != 0:
-            print(cadena)
-        
-        e.id = hashlib.md5(cadena.encode('utf-8')).hexdigest()
-   
-        e2 = task2.estado(e.graf, adyacente, e.lista_objetivos)
-        e2.graf.nodos_visitado = e.graf.nodos_visitado
-        e.nuevo_estado.append(e2)
-        sucesor(e2)
 
-current_nodo='0'
-
-lista_objetivos = SortedList(['33', '1200'])
-print("(" + current_nodo + "," + str(lista_objetivos) + ")")
-e = task2.estado(g, current_nodo, lista_objetivos)
-
-sucesor(e)

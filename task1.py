@@ -5,6 +5,7 @@ from sortedcontainers import *
 graphCR = []
 nodos = []
 list_graph_CR = SortedDict()
+list_nodos = SortedDict()
 
 
 class Nodes:
@@ -126,6 +127,15 @@ class Handler(xml.sax.ContentHandler):
         elif name=="node":
             nodos.append([self.node])
 
+            a = SortedList()        #adding edges to the sorted list
+            if self.node.id in list_nodos:
+                a = list_nodos.get(self.node.id)
+                a.add(self.node)
+                list_nodos.setdefault(self.node, a)
+            else:
+                a.add(self.node)
+                list_graph_CR[self.node.id] = a
+
         elif name=="edge":
 
             graphCR.append([self.edge])
@@ -149,6 +159,7 @@ class graph:
         self.nodos = nodos
         self.adyacencia = list_graph_CR
         self.nodos_visitado = []
+        self.lista_nodos = list_nodos
         
     def iniciar_grafo(self):
         HANDLER = Handler()
