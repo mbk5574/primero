@@ -134,7 +134,7 @@ class Handler(xml.sax.ContentHandler):
                 list_nodos.setdefault(self.node, a)
             else:
                 a.add(self.node)
-                list_graph_CR[self.node.id] = a
+                list_nodos[self.node.id] = a
 
         elif name=="edge":
 

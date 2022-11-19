@@ -24,7 +24,7 @@ class nodo:
         if(padre != ""):
             self.padre = padre
             self.profundidad = self.padre.profundidad + 1
-            self.costo = self.padre.co
+            self.costo = self.padre.costo+self.costo
     
     def camino(self):
         pass
