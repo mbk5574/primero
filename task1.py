@@ -138,7 +138,8 @@ class Handler(xml.sax.ContentHandler):
 
         elif name=="edge":
 
-            graphCR.append([self.edge])
+            graphCR.append(self.edge)
+            #print(self.edge.source)
 
             a = SortedList()        #adding edges to the sorted list
             if self.edge.source in list_graph_CR:
@@ -166,5 +167,8 @@ class graph:
         parser.setContentHandler(HANDLER) #setting the content handler
         parser.parse("graph.xml") #xml where graph is described
 
-    def reiniciar(self):
-        self.nodos_visitado.clear()
+    def get_arista(self, source, target):
+        
+        for arista in self.graf:
+           if (arista.source == source) & (arista.target == target):
+                return arista

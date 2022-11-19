@@ -11,9 +11,10 @@ solucion = False
 lista_objetivos = []
 total_nodos = -1
 
-class nodo:
+class nodo_arbol:
 
-    def __init__(self, padre):
+    def __init__(self, nodo, padre):
+        self.nodo = nodo.id
         self.id += total_nodos + 1   
         self.estado = task2.estado()
         self.valor = ""
@@ -43,11 +44,11 @@ def algoritmoBusqueda(nodo):
     if nodo.id in lista_objetivos:
         pass
 
-n = nodo("")
+
 
 lista = ['30', '60', '1300']
 e = task2.estado(lista, )
 
-frontera.append(nodo.id)
+#frontera.append(nodo.id)
 
     
