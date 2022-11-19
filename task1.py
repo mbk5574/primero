@@ -158,7 +158,6 @@ class graph:
         self.graf= graphCR
         self.nodos = nodos
         self.adyacencia = list_graph_CR
-        self.nodos_visitado = []
         self.lista_nodos = list_nodos
         
     def iniciar_grafo(self):
