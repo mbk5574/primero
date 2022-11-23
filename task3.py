@@ -1,11 +1,12 @@
-import task1, task2
+import task1
+import task2
 from sortedcontainers import *
 import hashlib
 
 g = task1.graph()
 g.iniciar_grafo()
 lista_nodos = g.lista_nodos
-nodos_visitados = []
+estados_visitados = []
 frontera = []
 solucion = False
 lista_objetivos = []
@@ -15,12 +16,14 @@ class nodo_arbol:
 
     def __init__(self, nodo, padre):
         self.nodo = nodo.id
-        self.id += total_nodos + 1   
+        self.id += (total_nodos + 1)
+        total_nodos = total_nodos + 1   
         self.estado = task2.estado()
         self.valor = ""
         self.profundidad = 0
         self.heuristica = ""
         self.accion = ""
+        nodo_grafo = lista_nodos.get(nodo.id)
 
         if(padre != ""):
             self.padre = padre
@@ -34,21 +37,45 @@ class nodo_arbol:
         return("[" + self.id) + "][" + self.costo + "," + self.estado.id + "," + self.padre.id + "," + self.accion + "," + self.profundidad + "," + self.heuristica + "," + self.valor + "]"
 
 
-def algoritmoBusqueda(nodo):
+def algoritmoBusqueda(nodo, maxdepth):
 
-    if len(frontera) != 0 & solucion:
+    if (len(frontera) == 0) or solucion:
+        nodo.estado.construir_camino()
         return
     
-    e = task2.estado(g, lista_objetivos, nodo)
+    nodo = frontera.pop
 
     if nodo.id in lista_objetivos:
-        pass
+        solucion = True
+    elif (nodo.profundidad <= maxdepth) & (nodo.estado not in estados_visitados):
+        estados_visitados.append(nodo.estado)
+        expandir(nodo)
+        for n in frontera:
+            algoritmoBusqueda(nodo, maxdepth)
+    else:
+        algoritmoBusqueda(nodo, maxdepth)
+
+def expandir(nodo):
+    s = g.adyacencia.get(nodo.nodo_grafo.id)
+
+    for node_grafo in s:
+        nodo_expandido = nodo_arbol(node_grafo, nodo)
+        e = task2.estado(g, lista_objetivos, nodo.estado, nodo, node_grafo)
+        nodo_expandido.estado = e
+        frontera.append(nodo_expandido)
 
 
+lista = ['30']
+n = lista_nodos.get('0')
 
-lista = ['30', '60', '1300']
-e = task2.estado(lista, )
+nodo = nodo_arbol(n, "")
+nodo.costo = 0
+e = task2.estado(g, lista, "", n, "")
+nodo.estado = e;
+maxdepth = 3
 
-#frontera.append(nodo.id)
+frontera.append(n)
+
+algoritmoBusqueda(nodo, maxdepth)
 
     
