@@ -15,7 +15,7 @@ total_nodos = -1
 class nodo_arbol:
 
     def __init__(self, nodo, padre):
-        self.nodo = nodo.id
+        self.nodo = lista_nodos.get(nodo.id)
         self.id += (total_nodos + 1)
         total_nodos = total_nodos + 1   
         self.estado = task2.estado()
@@ -23,7 +23,7 @@ class nodo_arbol:
         self.profundidad = 0
         self.heuristica = ""
         self.accion = ""
-        nodo_grafo = lista_nodos.get(nodo.id)
+        nodo_grafo = lista_nodos.get(self.nodo.id)
 
         if(padre != ""):
             self.padre = padre
@@ -49,28 +49,23 @@ def algoritmoBusqueda(nodo, maxdepth):
         solucion = True
     elif (nodo.profundidad <= maxdepth) & (nodo.estado not in estados_visitados):
         estados_visitados.append(nodo.estado)
-        expandir(nodo)
+        estados = expandir(nodo.estado)
         for n in frontera:
             algoritmoBusqueda(nodo, maxdepth)
     else:
         algoritmoBusqueda(nodo, maxdepth)
 
-def expandir(nodo):
-    s = g.adyacencia.get(nodo.nodo_grafo.id)
-
-    for node_grafo in s:
-        nodo_expandido = nodo_arbol(node_grafo, nodo)
-        e = task2.estado(g, lista_objetivos, nodo.estado, nodo, node_grafo)
-        nodo_expandido.estado = e
-        frontera.append(nodo_expandido)
+def expandir(e):
+    estados = task2.sucesor(e)
+    return estados
 
 
 lista = ['30']
-n = lista_nodos.get('0')
+n = "0"
 
 nodo = nodo_arbol(n, "")
 nodo.costo = 0
-e = task2.estado(g, lista, "", n, "")
+e = task2.estado(g, lista, "", nodo, "")
 nodo.estado = e;
 maxdepth = 3
 
