@@ -10,11 +10,13 @@ frontera = []
 solucion = False
 lista_objetivos = []
 total_nodos = 0
+estrategia = "p" #p= profundidad, a = anchura, c = coste uniforme
 
 class nodo_arbol:
 
     def __init__(self, nodo, padre):
         global total_nodos
+        global estrategia
         total_nodos = total_nodos + 1
         self.id = (total_nodos) 
         self.estado = ""
@@ -29,6 +31,15 @@ class nodo_arbol:
             self.padre = padre
             self.profundidad = self.padre.profundidad + 1
             self.costo = self.padre.costo+self.costo
+
+        if estrategia == "p":
+            self.valor = 1/(self.profundidad + 1)
+        elif estrategia == "a":
+            self.valor = self.profundidad
+        elif estrategia == "c":
+            self.valor = self.costo
+        else:
+            print("Escribe bien la estrategia")
     
     def camino(self):
         pass
@@ -44,11 +55,12 @@ class estado:
         self.lista_objetivos = lista_objetivos
         self.nodo_objetivo= nodo_objetivo
         self.current_nodo = current_nodo
+        self.cadena= ""
         if nodo_objetivo != "":
-            arista = self.g.get_arista(self.current_nodo.nodo_grafo, self.nodo_objetivo.nodo_grafo)
+            arista = self.g.get_arista(self.current_nodo.nodo_grafo.id, self.nodo_objetivo.nodo_grafo.id)
             self.coste = arista.length
             cadena = "(" + str(self.current_nodo.id) + "->" +str(self.nodo_objetivo.nodo_grafo.id)+",("+ str(self.nodo_objetivo.nodo_grafo.id) + str(self.lista_objetivos) + "),"+str(self.nodo_objetivo.costo)+")"
-            cadena=cadena.replace(" ","")
+            self.cadena=cadena.replace(" ","")
             self.id = hashlib.md5(cadena.encode("utf-8")).hexdigest()
             self.estado_anterior = estado_anterior
         else:
@@ -74,42 +86,61 @@ def sucesor(nodo = nodo_arbol):
     for adyacente in adyacentes: # Por cada nodo adyacente
         a = nodo.estado.g.lista_nodos.get(adyacente)
         n = nodo_arbol(a, nodo)
-        e2 = estado(e.g, e.lista_objetivos, e, n, nodo) # Creamos el siguiente estado, siendo el siguiente nodo, el nodo adyacente
+        e2 = estado(e.g, e.lista_objetivos, e, nodo, n) # Creamos el siguiente estado, siendo el siguiente nodo, el nodo adyacente
         if adyacente in e2.lista_objetivos: # Si el adyacente esta en la lista de objetivos, le eliminamos de dicha lista
             e2.lista_objetivos.remove(adyacente)   
         
         cadena = "(" + str(e.current_nodo) + "->" + str(adyacente) + ",(" + str(adyacente) + "," + str(e2.lista_objetivos) + "," + str(e2.coste) + ")"
         cadena=cadena.replace(" ","")
-        print(cadena)
         n.estado = e2
         nodos.append(n)
         #Siguiente adyacente
     return nodos
 
 
-def algoritmoBusqueda(maxdepth):
+def algoritmoBusqueda():
     global solucion
     global frontera
     global estados_visitados
+    global maxdepth
+    global estrategia
     if (len(frontera) == 0) or solucion:
         nodo.estado.construir_camino()
         return
-    
-    nodo = frontera.pop()
-    if nodo.nodo_grafo.id in lista_objetivos:
+    if estrategia == "p":
+        nodo = frontera.pop()
+    if estrategia == "a":
+        nodo = frontera.remove(0)
+    if estrategia == "c":
+        #nodo = frontera.elquemenorcostetenga
+        pass
+    print(nodo.estado.cadena)
+    if nodo.nodo_grafo.id in nodo.estado.lista_objetivos:
+        nodo.estado.lista_objetivos.remove(nodo.nodo_grafo.id)
         solucion = True
     elif (nodo.profundidad <= maxdepth) & (nodo.estado not in estados_visitados):
         estados_visitados.append(nodo.estado)
         expandir(nodo)
-        algoritmoBusqueda(maxdepth)
+        algoritmoBusqueda()
+    else:
+        algoritmoBusqueda()
 
 def expandir(nodo):
     nodos = sucesor(nodo)
-    for n in nodos:
-        frontera.append(n)
+    sorted(nodos, key= lambda x: x.valor)
+    for i in range(len(nodos)):
+        frontera.append[nodos[i]]
 
+def ordenar(nodo):
+    global frontera
+    for i in range(len(frontera)):
+        try:
+            if (nodo.valor < frontera[i].valor) & (nodo.valor > frontera[i+1].valor):
+                frontera.insert(i+1, nodo)
+        except IndexError:
+            frontera.append(nodo)
 
-lista = ['30']
+lista = ['1']
 n = "0"
 nodo = g.lista_nodos.get(n)
 e = estado (g, lista, "", nodo, "")
@@ -122,8 +153,9 @@ for ad in adyacentes:
     adyacente = nodo_arbol(add, nodo_arb)
     e1 = estado(g, lista, e, nodo_arb, adyacente)
     adyacente.estado = e
-    frontera.append(adyacente)
+    frontera.add(adyacente)
 
-maxdepth = 8
+maxdepth = 1000
 
-algoritmoBusqueda(maxdepth)
+algoritmoBusqueda()
+
