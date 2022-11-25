@@ -45,7 +45,8 @@ class estado:
         self.nodo_objetivo= nodo_objetivo
         self.current_nodo = current_nodo
         if nodo_objetivo != "":
-            self.coste = g.get_arista(current_nodo.nodo_grafo.id, nodo_objetivo.nodo_grafo.id).length
+            arista = self.g.get_arista(self.current_nodo.nodo_grafo, self.nodo_objetivo.nodo_grafo)
+            self.coste = arista.length
             cadena = "(" + str(self.current_nodo.id) + "->" +str(self.nodo_objetivo.nodo_grafo.id)+",("+ str(self.nodo_objetivo.nodo_grafo.id) + str(self.lista_objetivos) + "),"+str(self.nodo_objetivo.costo)+")"
             cadena=cadena.replace(" ","")
             self.id = hashlib.md5(cadena.encode("utf-8")).hexdigest()
@@ -88,19 +89,19 @@ def sucesor(nodo = nodo_arbol):
 
 def algoritmoBusqueda(maxdepth):
     global solucion
+    global frontera
+    global estados_visitados
     if (len(frontera) == 0) or solucion:
         nodo.estado.construir_camino()
         return
     
-    nodo = frontera.pop
-
+    nodo = frontera.pop()
     if nodo.nodo_grafo.id in lista_objetivos:
         solucion = True
     elif (nodo.profundidad <= maxdepth) & (nodo.estado not in estados_visitados):
         estados_visitados.append(nodo.estado)
         expandir(nodo)
-        for n in frontera:
-            algoritmoBusqueda(n, maxdepth)
+        algoritmoBusqueda(maxdepth)
 
 def expandir(nodo):
     nodos = sucesor(nodo)
