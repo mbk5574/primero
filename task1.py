@@ -127,13 +127,10 @@ class Handler(xml.sax.ContentHandler):
         elif name=="node":
             nodos.append([self.node])
 
-            a = SortedList()        #adding edges to the sorted list
+            a = self.node        #adding edges to the sorted list
             if self.node.id in list_nodos:
-                a = list_nodos.get(self.node.id)
-                a.add(self.node)
-                list_nodos.setdefault(self.node, a)
+                list_nodos.setdefault(self.node.id, a)
             else:
-                a.add(self.node)
                 list_nodos[self.node.id] = a
 
         elif name=="edge":
