@@ -11,7 +11,7 @@ frontera = []
 solucion = False
 lista_objetivos = []
 total_nodos = 0
-estrategia = "c" #p= profundidad, a = anchura, c = coste uniforme
+estrategia = "" #p= profundidad, a = anchura, c = coste uniforme
 maxdepth = -1
 
 for i in range(len(sys.argv)):
@@ -25,11 +25,11 @@ for i in range(len(sys.argv)):
         try:
             maxdepth = int(sys.argv[i+1])
         except IndexError:
-            print("En la opcion maxdepth \"-m\ tienes que poner despues un numero entero")
-            raise IndexError
+            raise IndexError("En la opcion maxdepth \"-m\" tienes que poner despues un numero entero")
         except TypeError:
-            print("El numero de maxdepth debe ser un entero")
-            raise TypeError
+            raise TypeError("El numero de maxdepth debe ser un entero mayor que 0")
+        except ValueError:
+            raise ValueError("El numero de maxdepth debe ser un entero mayor que 0")
 
 class nodo_arbol:
 
@@ -46,10 +46,10 @@ class nodo_arbol:
         self.nodo_grafo = nodo
         self.costo = 0
         self.coste = 0
-        self.padre = ""
+        self.padre = padre
 
-        if(padre != ""):
-            self.padre = padre
+        if(self.padre != ""):
+            
             self.profundidad = self.padre.profundidad + 1
             self.coste = g.get_arista(padre.nodo_grafo.id, nodo.id).length
             self.costo = float(self.padre.costo) + float(self.coste)
@@ -97,7 +97,6 @@ def sucesor(nodo):
     e = nodo.estado
     if len(e.lista_objetivos) == 0: #Si no quedan nodos objetivos, se hace return
         return
-    print(e.toString())
     adyacentes= SortedList()
     adyacentes = g.adyacencia.get(str(nodo.nodo_grafo.id)) #Recogemos los nodos adyacentes del nodo actual
     try:
@@ -113,7 +112,6 @@ def sucesor(nodo):
                 #nodo.estado.lista_objetivos.remove(adyacente)  
             cadena = "(" + str(e.current_nodo.nodo_grafo.id) + "->" + str(adyacente) + ",(" + str(adyacente) + "," + str(e2.lista_objetivos) + ")," + str(n_arbol.coste) + ")"
             cadena=cadena.replace(" ","")
-            print(cadena)
             n_arbol.estado = e2
             nodos.append(n_arbol)
             #Siguiente adyacente
@@ -173,7 +171,7 @@ def menor_coste():
     frontera.remove(frontera[coste[1]])
     return n
 
-lista = ['430']
+lista = ['1200']
 n = "0"
 nodo = g.lista_nodos.get(n)
 
@@ -181,5 +179,6 @@ nodo_arb = nodo_arbol(nodo, "")
 e = estado (lista, nodo_arb, "")
 nodo_arb.estado = e
 frontera.append(nodo_arb)
-
+if estrategia == "":
+    raise Exception("Seleccione una estrategia")
 algoritmoBusqueda()
