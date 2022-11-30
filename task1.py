@@ -169,3 +169,4 @@ class graph:
         for arista in self.graf:
            if (arista.source == source) & (arista.target == target):
                 return arista
+
