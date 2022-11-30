@@ -11,7 +11,10 @@ frontera = []
 solucion = False
 lista_objetivos = []
 total_nodos = 0
+
 estrategia = "" #p= profundidad, a = anchura, c = coste uniforme
+
+
 maxdepth = -1
 
 for i in range(len(sys.argv)):
@@ -31,6 +34,7 @@ for i in range(len(sys.argv)):
         except ValueError:
             raise ValueError("El numero de maxdepth debe ser un entero mayor que 0")
 
+
 class nodo_arbol:
 
     def __init__(self, nodo, padre):
@@ -47,7 +51,6 @@ class nodo_arbol:
         self.costo = 0
         self.coste = 0
         self.padre = padre
-
         if(self.padre != ""):
             
             self.profundidad = self.padre.profundidad + 1
@@ -63,9 +66,7 @@ class nodo_arbol:
         else:
             print("Escribe bien la estrategia")
     
-    def camino(self):
-        #cadena = "(" + str(e.current_nodo.nodo_grafo.id) + "->" + str(adyacente) + ",(" + str(adyacente) + "," + str(e2.lista_objetivos) + ")," + str(n_arbol.coste) + ")"
-            
+    def camino(self):    
         cadena = ""
         camino = []
         e = self.estado
@@ -94,7 +95,7 @@ class nodo_arbol:
         camino.reverse()
         for cad in camino:
             print(cad)
-        
+
     def toString(self):
         return("[" + self.id) + "][" + self.costo + "," + self.estado.id + "," + self.padre.id + "," + self.accion + "," + self.profundidad + "," + self.heuristica + "," + self.valor + "]"
 
@@ -118,6 +119,8 @@ def sucesor(nodo):
     e = nodo.estado
     if len(e.lista_objetivos) == 0: #Si no quedan nodos objetivos, se hace return
         return
+    print(e.toString())
+
     adyacentes= SortedList()
     adyacentes = g.adyacencia.get(str(nodo.nodo_grafo.id)) #Recogemos los nodos adyacentes del nodo actual
     try:
@@ -200,6 +203,8 @@ nodo_arb = nodo_arbol(nodo, "")
 e = estado (lista, nodo_arb, "")
 nodo_arb.estado = e
 frontera.append(nodo_arb)
+
 if estrategia == "":
     raise Exception("Seleccione una estrategia")
+    
 algoritmoBusqueda()
