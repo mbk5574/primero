@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import xml.sax
+import math
 from sortedcontainers import *
 
 graphCR = []
@@ -20,8 +21,18 @@ class Nodes:
         self.latitude=""
         self.ref=""
         self.highway=""
-        
+    
+    def coordenadas(self):
+        coor = (self.x, self.y)
+        return coor        
 
+    def euclidea(self, n):
+        c1 = self.coordenadas()
+        c2 = n.coordenadas()
+
+        dist = math.sqrt(((c1[0] - c2[0])**2) + ((c1[1] - c2[1])**2))
+        return dist
+        
 class Edges:
 
     def __init__( self,source,target ):

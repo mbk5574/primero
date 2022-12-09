@@ -24,6 +24,8 @@ for i in range(len(sys.argv)):
         estrategia = "p"
     elif sys.argv[i] == "-a":
         estrategia = "a"
+    elif sys.argv[i] == "-A":
+        estrategia = "A"
     elif sys.argv[i] == "-m":
         try:
             maxdepth = int(sys.argv[i+1])
@@ -45,12 +47,13 @@ class nodo_arbol:
         self.id = (total_nodos) 
         self.estado = ""
         self.profundidad = 0
-        self.heuristica = ""
+        self.heuristica = 0
         self.accion = ""
         self.nodo_grafo = nodo
         self.costo = 0
         self.coste = 0
         self.padre = padre
+
         if(self.padre != ""):
             
             self.profundidad = self.padre.profundidad + 1
@@ -63,9 +66,15 @@ class nodo_arbol:
             self.valor = self.profundidad
         elif estrategia == "c":
             self.valor = self.costo
+        elif estrategia == "A":
+            self.valor = self.heuristica + self.costo
         else:
             print("Escribe bien la estrategia")
     
+    def heuristica(self, heur):
+        self.heuristica = heur
+        self.valor = self.costo + heur
+
     def camino(self):    
         cadena = ""
         camino = []
@@ -109,12 +118,25 @@ class estado:
         self.cadena=self.cadena.replace(" ","")
         self.id = hashlib.md5(self.cadena.encode("utf-8")).hexdigest() #Montamos cadena encriptada en md5, que será el id del estado
         self.estado_anterior = estado_anterior
+
     def toString(self):
         return self.cadena
-        
+    def heuristica(self):
+        if self.estado_anterior == "":
+            pass
+
+def min_euclideo(nodo, lista_objetivos):
+    dist_min = 0
+    for i in range(len(lista_objetivos)):
+        d = nodo.nodo_grafo.euclidea(g.lista_nodos.get(lista_objetivos[i]))
+        if (d < dist_min) or (d == 0):
+            dist_min = d
+    return dist_min
+
 def sucesor(nodo):
     global g
     global lista_objetivos
+    global d1
     nodos = []
     e = nodo.estado
     if len(e.lista_objetivos) == 0: #Si no quedan nodos objetivos, se hace return
@@ -133,10 +155,18 @@ def sucesor(nodo):
                 e2.lista_objetivos.remove(adyacente)
                 n_arbol.estado = e2
                 n_arbol.camino()
-                #nodo.estado.lista_objetivos.remove(adyacente)  
+                
+            if estrategia == "A":
+                d2 = min_euclideo(nodo, e2.lista_objetivos)
+                if(d1 < d2):
+                    n_arbol.heuristica(d1*len(e2.lista_objetivos)) 
+                else:
+                    n_arbol.heuristica(d2*len(e2.lista_objetivos)) 
+
             cadena = "(" + str(e.current_nodo.nodo_grafo.id) + "->" + str(adyacente) + ",(" + str(adyacente) + "," + str(e2.lista_objetivos) + ")," + str(n_arbol.coste) + ")"
             cadena=cadena.replace(" ","")
             n_arbol.estado = e2
+
             nodos.append(n_arbol)
             #Siguiente adyacente
     except TypeError:
@@ -162,9 +192,8 @@ def algoritmoBusqueda():
         elif estrategia == "a":
             nodo = frontera[0]
             frontera.remove(frontera[0])
-        elif estrategia == "c":
-            nodo = menor_coste()
-
+        elif (estrategia == "c") or (estrategia == "A"):
+            nodo = menor_valor()
         if len(nodo.estado.lista_objetivos) == 0:
             solucion = True
         
@@ -183,19 +212,40 @@ def expandir(nodo):
     except TypeError:
         pass
 
-def menor_coste():
+def menor_valor():
     global frontera
-    coste = (0, 0)
+    valor = (0, 0)
     for i in range(len(frontera)):
-        n_coste = frontera[0].costo
-        if n_coste < coste[0]:
-            coste = (n_coste, i)
+        n_valor = frontera[0].valor
+        if n_valor < valor[0]:
+            valor = (n_valor, i)
     
-    n = frontera[coste[1]]
-    frontera.remove(frontera[coste[1]])
+    n = frontera[valor[1]]
+    frontera.remove(frontera[valor[1]])
     return n
 
-lista = ['1200']
+
+
+def min_euclidea_objetivos(lista_n):
+    dist_min = (0, 0, 0)
+    for i in range(len(lista_objetivos)):
+        for j in range(len(lista_objetivos)-1):
+            if (i != j) and (i<j):
+                d = g.lista_nodos.get(lista_n[i]).euclidea(g.lista_nodos.get(lista_n[j]))
+                if (d < dist_min[2]) or (dist_min[2] == 0):
+                    dist_min = (i, j, d)
+    return dist_min
+
+lista = ['1', '2', '3', '4']
+
+if estrategia == "A":
+    lista_n = []
+    for nodo in lista:
+        nodo_grafo = g.lista_nodos.get(nodo)   
+        lista_n.append(nodo_grafo)
+
+    d1 = min_euclidea_objetivos(lista_n)
+
 n = "0"
 nodo = g.lista_nodos.get(n)
 
