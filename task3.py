@@ -10,7 +10,7 @@ estados_visitados = []
 frontera = []
 solucion = False
 lista_objetivos = []
-total_nodos = 0
+total_nodos = -1
 
 estrategia = "" #p= profundidad, a = anchura, c = coste uniforme
 
@@ -75,13 +75,13 @@ class nodo_arbol:
 
         accion = "(" + str(self.padre.nodo_grafo.id) + "->" + str(self.nodo_grafo.id) + ")"
         estado = self.estado.id[(len(self.estado.id) -6): len(self.estado.id)]
-        cadena = "[" + str(self.nodo_grafo.id) + "][" + str(p.costo) + "," + str(estado) + "," + str(self.padre.nodo_grafo.id) + "," + accion + "," + str(self.profundidad) + "," + str(self.heuristica) + "," + str(self.valor) + "]"
+        cadena = "[" + str(self.id) + "][" + str(p.costo) + "," + "[" + p.estado.toString() + "|" + str(estado) + "]" + "," + str(self.padre.id) + "," + accion + "," + str(self.profundidad) + "," + str(self.heuristica) + "," + str(self.valor) + "]"
         camino.append(cadena)
         while p != "":
             try:
                 estado = p.estado.id[(len(p.estado.id) -6): len(p.estado.id)]
                 accion = "(" + str(p.nodo_grafo.id) + "->" + str(h.nodo_grafo.id) + ")"
-                cadena = "[" + str(p.nodo_grafo.id) + "][" + str(p.costo) + "," + estado + "," + str(p.padre.nodo_grafo.id) + "," + accion + "," + str(p.profundidad) + "," + str(p.heuristica) + "," + str(p.valor) + "]"
+                cadena = "[" + str(p.id) + "][" + str(p.costo) + "," + "[" + p.estado.toString() + "|" + str(estado) + "]" + "," + str(p.padre.id) + "," + accion + "," + str(p.profundidad) + "," + str(p.heuristica) + "," + str(p.valor) + "]"
                 cadena = cadena.replace(" ", "")
                 camino.append(cadena)
             except Exception as ex:
@@ -90,12 +90,12 @@ class nodo_arbol:
             p = p.padre
         
         estado = h.estado.id[(len(h.estado.id) -6): len(h.estado.id)]
-        cadena = "[" + str(h.nodo_grafo.id) + "][" + str(h.costo) + "," + str(estado) + "," + str(h.profundidad) + "," + str(h.heuristica) + "," + str(h.valor) + "]"
+        cadena = "[" + str(h.id) + "][" + str(h.costo) + "," + "[" + h.estado.toString() + "|" + str(estado) + "]" + "," + str(h.profundidad) + "," + str(h.heuristica) + "," + str(h.valor) + "]"
         camino.append(cadena)     
         camino.reverse()
         for cad in camino:
             print(cad)
-
+        
     def toString(self):
         return("[" + self.id) + "][" + self.costo + "," + self.estado.id + "," + self.padre.id + "," + self.accion + "," + self.profundidad + "," + self.heuristica + "," + self.valor + "]"
 
@@ -119,7 +119,7 @@ def sucesor(nodo):
     e = nodo.estado
     if len(e.lista_objetivos) == 0: #Si no quedan nodos objetivos, se hace return
         return
-    print(e.toString())
+    #print(e.toString())
 
     adyacentes= SortedList()
     adyacentes = g.adyacencia.get(str(nodo.nodo_grafo.id)) #Recogemos los nodos adyacentes del nodo actual
@@ -195,8 +195,8 @@ def menor_coste():
     frontera.remove(frontera[coste[1]])
     return n
 
-lista = ['1200']
-n = "0"
+lista = ['248', '528', '896', '1097']
+n = "37"
 nodo = g.lista_nodos.get(n)
 
 nodo_arb = nodo_arbol(nodo, "")
