@@ -12,7 +12,7 @@ solucion = False
 lista_objetivos = []
 total_nodos = -1
 ultimo = False
-estrategia = "" #p= profundidad, a = anchura, c = coste uniforme
+estrategia = "A" #p= profundidad, a = anchura, c = coste uniforme
 
 maxdepth = -1
 
@@ -69,7 +69,7 @@ class nodo_arbol:
         else:
             print("Escribe bien la estrategia")
     
-    def heuristica(self, heur):
+    def heuri(self, heur):
         self.heuristica = heur
         self.valor = self.costo + heur
 
@@ -127,17 +127,21 @@ class estado:
 
 def min_euclideo(nodo, lista_objetivos):
     dist_min = 0
+    d = 0
     for i in range(len(lista_objetivos)):
         d = nodo.nodo_grafo.euclidea(g.lista_nodos.get(lista_objetivos[i]))
         if (d < dist_min) or (d == 0):
             dist_min = d
     return dist_min
 
-def aaa(nodo):
+def objetivo(nodo):
     global ultimo
     if len(nodo.estado.lista_objetivos) != 0:
         nodo.padre = ""
         ultimo = True
+    if(estrategia == "A"):
+        d1 = min_euclidea_objetivos(nodo.estado.lista_objetivos)
+        nodo.heuristica = d1
     frontera.clear()
     frontera.append(nodo)
     estados_visitados.clear()
@@ -165,25 +169,26 @@ def sucesor(nodo):
                 e2 = estado(e.lista_objetivos, n_arbol, e) # Creamos el siguiente estado, siendo el siguiente nodo, el nodo adyacente
                 n_arbol.estado = e2
                 n_arbol.camino()
-                aaa(n_arbol)
+                objetivo(n_arbol)
 
-            if estrategia == "A":
-                d2 = min_euclideo(nodo, e2.lista_objetivos)
-                if(d1 < d2):
-                    n_arbol.heuristica(d1*len(e2.lista_objetivos)) 
-                else:
-                    n_arbol.heuristica(d2*len(e2.lista_objetivos)) 
-     
             e2 = estado(e.lista_objetivos, n_arbol, e) # Creamos el siguiente estado, siendo el siguiente nodo, el nodo adyacente
             n_arbol.estado = e2
 
+            if estrategia == "A":
+                d2 = min_euclideo(nodo, e2.lista_objetivos)
+                if d1 <= d2:
+                    n_arbol.heuri(d1*len(e2.lista_objetivos)) 
+                else:
+                    n_arbol.heuri(d2*len(e2.lista_objetivos)) 
+     
             cadena = "(" + str(e.current_nodo.nodo_grafo.id) + "->" + str(adyacente) + ",(" + str(adyacente) + "," + str(e2.lista_objetivos) + ")," + str(n_arbol.coste) + ")"
             cadena=cadena.replace(" ","")
             n_arbol.estado = e2
 
             nodos.append(n_arbol)
             #Siguiente adyacente
-    except TypeError:
+    except TypeError as ex:
+        print(str(ex))
         pass
     
     return nodos
@@ -199,7 +204,6 @@ def algoritmoBusqueda():
     while True:
      
         if (len(frontera) == 0) or solucion:
-            #nodo.camino()
             break
 
         if estrategia == "p":
@@ -209,8 +213,10 @@ def algoritmoBusqueda():
             frontera.remove(frontera[0])
         elif (estrategia == "c") or (estrategia == "A"):
             nodo = menor_valor()
+
         if len(nodo.estado.lista_objetivos) == 0:
             solucion = True
+
         if (((nodo.profundidad <= maxdepth) or (maxdepth == -1)) & (nodo.estado.id not in estados_visitados)):
             estados_visitados.append(nodo.estado.id)
             expandir(nodo)
@@ -244,19 +250,7 @@ def min_euclidea_objetivos(lista_n):
                 d = g.lista_nodos.get(lista_n[i]).euclidea(g.lista_nodos.get(lista_n[j]))
                 if (d < dist_min[2]) or (dist_min[2] == 0):
                     dist_min = (i, j, d)
-    return dist_min
-
-lista = ['1', '2', '3', '4']
-
-if estrategia == "A":
-    lista_n = []
-    for nodo in lista:
-        nodo_grafo = g.lista_nodos.get(nodo)   
-        lista_n.append(nodo_grafo)
-
-    d1 = min_euclidea_objetivos(lista_n)
-
-n = "0"
+    return dist_min[2]
 
 lista = ['248', '528', '896', '1097']
 n = "37"
@@ -265,6 +259,16 @@ nodo = g.lista_nodos.get(n)
 nodo_arb = nodo_arbol(nodo, "")
 e = estado (lista, nodo_arb, "")
 nodo_arb.estado = e
+
+if estrategia == "A":
+    lista_n = []
+    for nodo in lista:
+        nodo_grafo = g.lista_nodos.get(nodo)   
+        lista_n.append(nodo_grafo)
+        
+    d1 = min_euclidea_objetivos(lista_n)
+    nodo_arb.heuristica = d1
+
 frontera.append(nodo_arb)
 
 if estrategia == "":

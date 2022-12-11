@@ -23,7 +23,7 @@ class Nodes:
         self.highway=""
     
     def coordenadas(self):
-        coor = (self.x, self.y)
+        coor = (float(self.x), float(self.y))
         return coor        
 
     def euclidea(self, n):
