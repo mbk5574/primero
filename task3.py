@@ -11,9 +11,8 @@ frontera = []
 solucion = False
 lista_objetivos = []
 total_nodos = -1
-
+ultimo = False
 estrategia = "" #p= profundidad, a = anchura, c = coste uniforme
-
 
 maxdepth = -1
 
@@ -33,7 +32,6 @@ for i in range(len(sys.argv)):
             raise TypeError("El numero de maxdepth debe ser un entero mayor que 0")
         except ValueError:
             raise ValueError("El numero de maxdepth debe ser un entero mayor que 0")
-
 
 class nodo_arbol:
 
@@ -66,17 +64,19 @@ class nodo_arbol:
         else:
             print("Escribe bien la estrategia")
     
-    def camino(self):    
+    def camino(self):   
+        global ultimo 
         cadena = ""
         camino = []
-        e = self.estado
         p = self
         h = ""
 
         accion = "(" + str(self.padre.nodo_grafo.id) + "->" + str(self.nodo_grafo.id) + ")"
         estado = self.estado.id[(len(self.estado.id) -6): len(self.estado.id)]
         cadena = "[" + str(self.id) + "][" + str(p.costo) + "," + "[" + p.estado.toString() + "|" + str(estado) + "]" + "," + str(self.padre.id) + "," + accion + "," + str(self.profundidad) + "," + str(self.heuristica) + "," + str(self.valor) + "]"
-        camino.append(cadena)
+        if ultimo:
+            camino.append(cadena)
+
         while p != "":
             try:
                 estado = p.estado.id[(len(p.estado.id) -6): len(p.estado.id)]
@@ -88,17 +88,16 @@ class nodo_arbol:
                 cadena = ""
             h = p
             p = p.padre
-        
+               
         estado = h.estado.id[(len(h.estado.id) -6): len(h.estado.id)]
         cadena = "[" + str(h.id) + "][" + str(h.costo) + "," + "[" + h.estado.toString() + "|" + str(estado) + "]" + "," + str(h.profundidad) + "," + str(h.heuristica) + "," + str(h.valor) + "]"
         camino.append(cadena)     
         camino.reverse()
         for cad in camino:
             print(cad)
-        
+             
     def toString(self):
         return("[" + self.id) + "][" + self.costo + "," + self.estado.id + "," + self.padre.id + "," + self.accion + "," + self.profundidad + "," + self.heuristica + "," + self.valor + "]"
-
 
 class estado:
 
@@ -111,7 +110,17 @@ class estado:
         self.estado_anterior = estado_anterior
     def toString(self):
         return self.cadena
-        
+
+def aaa(nodo):
+    global ultimo
+    if len(nodo.estado.lista_objetivos) != 0:
+        nodo.padre = ""
+        ultimo = True
+    frontera.clear()
+    frontera.append(nodo)
+    estados_visitados.clear()
+    algoritmoBusqueda()
+
 def sucesor(nodo):
     global g
     global lista_objetivos
@@ -119,7 +128,6 @@ def sucesor(nodo):
     e = nodo.estado
     if len(e.lista_objetivos) == 0: #Si no quedan nodos objetivos, se hace return
         return
-    #print(e.toString())
 
     adyacentes= SortedList()
     adyacentes = g.adyacencia.get(str(nodo.nodo_grafo.id)) #Recogemos los nodos adyacentes del nodo actual
@@ -128,12 +136,15 @@ def sucesor(nodo):
         
             n = g.lista_nodos.get(adyacente)
             n_arbol = nodo_arbol(n, nodo)
-            e2 = estado(e.lista_objetivos, n_arbol, e) # Creamos el siguiente estado, siendo el siguiente nodo, el nodo adyacente
-            if adyacente in e2.lista_objetivos: # Si el adyacente esta en la lista de objetivos, le eliminamos de dicha lista
-                e2.lista_objetivos.remove(adyacente)
+           
+            if adyacente in e.lista_objetivos: # Si el adyacente esta en la lista de objetivos, le eliminamos de dicha lista
+                e.lista_objetivos.remove(adyacente)
+                e2 = estado(e.lista_objetivos, n_arbol, e) # Creamos el siguiente estado, siendo el siguiente nodo, el nodo adyacente
                 n_arbol.estado = e2
                 n_arbol.camino()
-                #nodo.estado.lista_objetivos.remove(adyacente)  
+                aaa(n_arbol)
+            e2 = estado(e.lista_objetivos, n_arbol, e) # Creamos el siguiente estado, siendo el siguiente nodo, el nodo adyacente
+            n_arbol.estado = e2
             cadena = "(" + str(e.current_nodo.nodo_grafo.id) + "->" + str(adyacente) + ",(" + str(adyacente) + "," + str(e2.lista_objetivos) + ")," + str(n_arbol.coste) + ")"
             cadena=cadena.replace(" ","")
             n_arbol.estado = e2
@@ -155,6 +166,7 @@ def algoritmoBusqueda():
     while True:
      
         if (len(frontera) == 0) or solucion:
+            #nodo.camino()
             break
 
         if estrategia == "p":
@@ -167,12 +179,9 @@ def algoritmoBusqueda():
 
         if len(nodo.estado.lista_objetivos) == 0:
             solucion = True
-        
         if (((nodo.profundidad <= maxdepth) or (maxdepth == -1)) & (nodo.estado.id not in estados_visitados)):
             estados_visitados.append(nodo.estado.id)
             expandir(nodo)
-
-        
 
 def expandir(nodo):
     nodos = sucesor(nodo)
