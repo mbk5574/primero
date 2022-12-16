@@ -75,6 +75,7 @@ class nodo_arbol:
         self.valor = round((self.costo + heur), 2)
 
     def camino(self):   
+       
         global ultimo 
         global primero
         cadena = ""
@@ -139,11 +140,11 @@ class estado:
 
 def min_euclideo(nodo, lista_objetivos):
     global g
-    dist_min = 0
+    dist_min = float("inf")
     d = 0
     for i in range(len(lista_objetivos)):
         d = nodo.nodo_grafo.euclidea(g.lista_nodos.get(lista_objetivos[i]))
-        if (d < dist_min) or (dist_min == 0):
+        if d < dist_min:
             dist_min = d
     return dist_min
 
@@ -153,11 +154,7 @@ def objetivo(nodo):
         nodo.padre = None
         ultimo = True
     if(estrategia == "A"):
-        lista_n = []
-        for node in nodo.estado.lista_objetivos:
-            nodo_grafo = g.lista_nodos.get(node)   
-            lista_n.append(nodo_grafo)
-        d = min_euclidea_objetivos(lista_n)
+        d = min_euclideo(nodo, nodo.estado.lista_objetivos)
         nodo.heuri(d)
 
     frontera.clear()
@@ -173,12 +170,12 @@ def sucesor(nodo):
     e = nodo.estado
     if len(e.lista_objetivos) == 0: #Si no quedan nodos objetivos, se hace return
         return
-
-    adyacentes= sortedlist.SortedList()
-    adyacentes = g.adyacencia.get(str(nodo.nodo_grafo.id)) #Recogemos los nodos adyacentes del nodo actual
     try:
+        adyacentes= sortedlist.SortedList()
+        adyacentes = g.adyacencia.get(str(nodo.nodo_grafo.id)) #Recogemos los nodos adyacentes del nodo actual
+        adyacentes = sorted(adyacentes, key=int)
         for adyacente in adyacentes: # Por cada nodo adyacente
-        
+            
             n = g.lista_nodos.get(adyacente)
             n_arbol = nodo_arbol(n, nodo)
             
@@ -202,9 +199,9 @@ def sucesor(nodo):
             cadena = "(" + str(e.current_nodo.nodo_grafo.id) + "->" + str(adyacente) + ",(" + str(adyacente) + "," + str(e2.lista_objetivos) + ")," + str(n_arbol.coste) + ")"
             cadena=cadena.replace(" ","")
             n_arbol.estado = e2
-
             nodos.append(n_arbol)
             #Siguiente adyacente
+        
     except TypeError as ex:
         pass
     
@@ -249,24 +246,30 @@ def expandir(nodo):
 
 def menor_valor():
     global frontera
-    valor = (0, 0)
+    valor = (float("inf"), 0)
     for i in range(len(frontera)):
-        n_valor = frontera[0].valor
+        n_valor = frontera[i].valor
         if n_valor < valor[0]:
             valor = (n_valor, i)
-    
+        elif n_valor == valor[0]:
+            a = frontera[i]
+            b = frontera[valor[1]]
+            if a.nodo_grafo.id < b.nodo_grafo.id:
+                valor = (n_valor, i)
+            else:
+                valor = (n_valor, valor[1])
+
     n = frontera[valor[1]]
     frontera.remove(frontera[valor[1]])
     return n
 
 def min_euclidea_objetivos(lista_n):
-    global g
-    dist_min = 0
+    dist_min = float("inf")
     for i in range(len(lista_n)):
         for j in range(len(lista_n)):
-            if i < j:
+            if i != j:
                 d = lista_n[i].euclidea(lista_n[j])
-                if (d < dist_min) or (dist_min == 0):
+                if d < dist_min:
                     dist_min = d
     return dist_min
 
@@ -284,8 +287,8 @@ if estrategia == "A":
         nodo_grafo = g.lista_nodos.get(nodo)   
         lista_n.append(nodo_grafo)
         
-    d1 = min_euclidea_objetivos(lista_n)
-    nodo_arb.heuri(d1)
+    d1 = min_euclidea_objetivos(lista_n) 
+    nodo_arb.heuri(d1* len(lista))
 
 frontera.append(nodo_arb)
 

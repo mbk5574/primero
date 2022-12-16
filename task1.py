@@ -145,17 +145,14 @@ class Handler(xml.sax.ContentHandler):
                 list_nodos[self.node.id] = a
 
         elif name=="edge":
-
             graphCR.append(self.edge)
-            #print(self.edge.source)
-
-            a = SortedList()        #adding edges to the sorted list
+            a = []        #adding edges to the sorted list
             if self.edge.source in list_graph_CR:
                 a = list_graph_CR.get(self.edge.source)
-                a.add(self.edge.target)
+                a.append(self.edge.target)
                 list_graph_CR.setdefault(self.edge.source, a)
             else:
-                a.add(self.edge.target)
+                a.append(self.edge.target)
                 list_graph_CR[self.edge.source] = a
     
         self.CurrentData=""
