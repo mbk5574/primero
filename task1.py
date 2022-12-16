@@ -31,7 +31,7 @@ class Nodes:
         c2 = n.coordenadas()
 
         dist = math.sqrt(((c1[0] - c2[0])**2) + ((c1[1] - c2[1])**2))
-        return dist
+        return round(dist, 2)
         
 class Edges:
 
