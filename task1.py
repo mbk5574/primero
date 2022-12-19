@@ -5,7 +5,7 @@ from sortedcontainers import *
 
 graphCR = []
 nodos = []
-list_graph_CR = SortedDict()
+list_graph_CR = {}
 list_nodos = SortedDict()
 
 
@@ -31,7 +31,7 @@ class Nodes:
         c2 = n.coordenadas()
 
         dist = math.sqrt(((c1[0] - c2[0])**2) + ((c1[1] - c2[1])**2))
-        return round(dist, 2)
+        return dist
         
 class Edges:
 
@@ -150,10 +150,10 @@ class Handler(xml.sax.ContentHandler):
             if self.edge.source in list_graph_CR:
                 a = list_graph_CR.get(self.edge.source)
                 a.append(self.edge.target)
-                list_graph_CR.setdefault(self.edge.source, a)
-            else:
-                a.append(self.edge.target)
+                a = sorted(a, key=int)
                 list_graph_CR[self.edge.source] = a
+            else:
+                list_graph_CR[self.edge.source] = [self.edge.target]
     
         self.CurrentData=""
     
@@ -177,4 +177,3 @@ class graph:
         for arista in self.graf:
            if (arista.source == source) & (arista.target == target):
                 return arista
-

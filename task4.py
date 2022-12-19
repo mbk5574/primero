@@ -1,5 +1,4 @@
 import task1
-from sortedcontainers import sortedlist
 import hashlib
 import sys
 from bisect import insort
@@ -14,7 +13,7 @@ lista_objetivos = []
 total_nodos = -1
 ultimo = False
 primero = True
-estrategia = "c" #p= profundidad, a = anchura, c = coste uniforme
+estrategia = "Ar" #p= profundidad, a = anchura, c = coste uniforme
 
 maxdepth = -1
 
@@ -27,6 +26,8 @@ for i in range(len(sys.argv)):
         estrategia = "a"
     elif sys.argv[i] == "-A":
         estrategia = "A"
+    elif sys.argv[i] == "-Ar":
+        estrategia = "Ar"
     elif sys.argv[i] == "-m":
         try:
             maxdepth = int(sys.argv[i+1])
@@ -44,7 +45,7 @@ class nodo_arbol:
         global estrategia
         global g
         total_nodos = total_nodos + 1
-        self.id = (total_nodos) 
+        self.id = total_nodos 
         self.estado = None
         self.profundidad = 0
         self.heuristica = 0
@@ -58,7 +59,7 @@ class nodo_arbol:
             
             self.profundidad = self.padre.profundidad + 1
             self.coste = g.get_arista(padre.nodo_grafo.id, nodo.id).length
-            self.costo = round((float(self.padre.costo) + float(self.coste)), 2)
+            self.costo = round((float(self.padre.costo) + float(self.coste)), 3)
            
         if estrategia == "p":
             self.valor = 1/(self.profundidad + 1)
@@ -66,10 +67,10 @@ class nodo_arbol:
             self.valor = self.profundidad
         elif estrategia == "c":
             self.valor = self.costo
-        elif estrategia == "A":
-            self.valor = self.heuristica + self.costo
+        elif estrategia == "A" or estrategia == "Ar":
+            pass
         else:
-            print("Escribe bien la estrategia")
+            raise Exception("Escribe bien la estrategia")
     
     def heuri(self, heur):
         self.heuristica = round(heur, 2)
@@ -104,8 +105,6 @@ class nodo_arbol:
                 cadena += "[" + str(nodo.id) + "]" + str(nodo.costo) + ",[" + nodo.estado.toString() + "|" + str(estado) + "],None,None," + str(nodo.profundidad) + "," + str(nodo.heuristica) + "," + str(nodo.valor) + "\n"
         print(cadena)
 
-    
-
     def toString(self):
         return("[" + self.id) + "][" + self.costo + "," + self.estado.id + "," + self.padre.id + "," + self.accion + "," + self.profundidad + "," + self.heuristica + "," + self.valor + "]"
 
@@ -135,29 +134,38 @@ def sucesor(nodo):
     global g
     global lista_objetivos
     global d1
+    global total_nodos
+    global arc_min_ec
     nodos = []
     e = nodo.estado
     if len(e.lista_objetivos) == 0: #Si no quedan nodos objetivos, se hace return
         return
     try:
-        adyacentes= sortedlist.SortedList()
+        
         adyacentes = g.adyacencia.get(str(nodo.nodo_grafo.id)) #Recogemos los nodos adyacentes del nodo actual
-        adyacentes = sorted(adyacentes, key=int)
         for adyacente in adyacentes: # Por cada nodo adyacente
-            
+       
             n = g.lista_nodos.get(adyacente)
             n_arbol = nodo_arbol(n, nodo)
             
             e2 = estado(e.lista_objetivos, n_arbol) # Creamos el siguiente estado, siendo el siguiente nodo, el nodo adyacente
             n_arbol.estado = e2
 
+            if n_arbol.nodo_grafo.id in n_arbol.estado.lista_objetivos: # Si el adyacente esta en la lista de objetivos, le eliminamos de dicha lista
+                l = n_arbol.estado.lista_objetivos.copy()
+                l.remove(n_arbol.nodo_grafo.id)
+                e2 = estado(l, n_arbol) # Creamos el siguiente estado, siendo el siguiente nodo, el nodo adyacente
+                n_arbol.estado = e2
+
             if estrategia == "A":
-                d2 = min_euclideo(nodo, e2.lista_objetivos)
+                d2 = min_euclideo(n_arbol, e2.lista_objetivos)
                 if d1 <= d2:
                     n_arbol.heuri((d1*len(e2.lista_objetivos))) 
                 else:
-                    n_arbol.heuri((d2*len(e2.lista_objetivos))) 
-            
+                    n_arbol.heuri((d2*len(e2.lista_objetivos)))
+            elif estrategia == "Ar":
+                n_arbol.heuri(arc_min_ec*len(e2.lista_objetivos)) 
+                              
             nodos.append(n_arbol)
             #Siguiente adyacente
         
@@ -178,19 +186,10 @@ def algoritmoBusqueda():
 
         if estrategia == "p":
             nodo = frontera.pop()
-        elif estrategia == "a":
-            nodo = frontera[0]
-            frontera.remove(frontera[0])
-        elif (estrategia == "c") or (estrategia == "A"):
+        elif (estrategia == "c") or (estrategia == "A" or (estrategia == "a") or (estrategia == "Ar")):
             nodo = frontera[0]
             frontera.remove(frontera[0])
         
-        if nodo.nodo_grafo.id in nodo.estado.lista_objetivos: # Si el adyacente esta en la lista de objetivos, le eliminamos de dicha lista
-                l = nodo.estado.lista_objetivos.copy()
-                l.remove(nodo.nodo_grafo.id)
-                e2 = estado(l, nodo) # Creamos el siguiente estado, siendo el siguiente nodo, el nodo adyacente
-                nodo.estado = e2
-
         if len(nodo.estado.lista_objetivos) == 0:
             solucion = True
             nodo.obtener_camino()
@@ -217,10 +216,11 @@ def min_euclidea_objetivos(lista_n):
                     dist_min = d
     return dist_min
 
-lista = ['1185', '1252', '1314']
-n = "205"
-nodo = g.lista_nodos.get(n)
 
+lista = ['248', '528', '896', '1097']
+n = "37"
+nodo = g.lista_nodos.get(n)
+arc_min_ec = 0
 nodo_arb = nodo_arbol(nodo, None)
 e = estado (lista, nodo_arb)
 nodo_arb.estado = e
@@ -232,11 +232,19 @@ if estrategia == "A":
         lista_n.append(nodo_grafo)
         
     d1 = min_euclidea_objetivos(lista_n) 
-    nodo_arb.heuri(d1* len(lista))
-
+    nodo_arb.heuri(d1*len(lista))
+elif estrategia == "Ar":
+    min_coste = float("inf")
+    h = 0
+    for arista in g.graf:
+        h = float(arista.length)
+        if h < min_coste:
+            min_coste = h
+    min_coste = round(min_coste, 2)
+    nodo_arb.heuri(min_coste*len(lista))
+    arc_min_ec = min_coste
 frontera.append(nodo_arb)
 
 if estrategia == "":
     raise Exception("Seleccione una estrategia")
-    
 algoritmoBusqueda()
