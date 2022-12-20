@@ -2,17 +2,15 @@ import task1
 import hashlib
 import sys
 from bisect import insort
-from itertools import count
 
 g = task1.graph()
 g.iniciar_grafo()
 lista_nodos = g.lista_nodos
 estados_visitados = []
 frontera = []
-estrategia = "Ar" #p= profundidad, a = anchura, c = coste uniforme
-
+estrategia = "A" #p= profundidad, a = anchura, c = coste uniforme
 maxdepth = -1
-
+a = False
 for i in range(len(sys.argv)):
     if sys.argv[i] == "-c":
         estrategia = "c"
@@ -56,7 +54,7 @@ class nodo_arbol:
             
             self.profundidad = self.padre.profundidad + 1
             self.coste = g.get_arista(padre.nodo_grafo.id, nodo.id).length
-            self.costo = round((float(self.padre.costo) + float(self.coste)), 3)
+            self.costo = float(self.padre.costo) + float(self.coste)
            
         if estrategia == "p":
             self.valor = 1/(self.profundidad + 1)
@@ -70,8 +68,8 @@ class nodo_arbol:
             raise Exception("Escribe bien la estrategia")
     
     def heuri(self, heur):
-        self.heuristica = round(heur, 2)
-        self.valor = round((self.costo + heur), 2)
+        self.heuristica = heur
+        self.valor = (self.costo + heur)
 
     def obtener_camino(self):
         # Crea una lista vacía para almacenar el camino
@@ -95,15 +93,15 @@ class nodo_arbol:
             try:
                 estado = nodo.estado.id[(len(nodo.estado.id) -6): len(nodo.estado.id)]
                 accion = "(" + str(nodo.padre.nodo_grafo.id) + "->" + str(nodo.nodo_grafo.id) + ")"
-                cadena += "[" + str(nodo.id) + "][" + str(nodo.costo) + "," + "[" + nodo.estado.toString() + "|" + str(estado) + "]" + "," + str(nodo.padre.id) + "," + accion + "," + str(nodo.profundidad) + "," + str(nodo.heuristica) + "," + str(nodo.valor) + "\n"
+                cadena += "[" + str(nodo.id) + "][" + str(round(nodo.costo, 2)) + "," + "[" + nodo.estado.toString() + "|" + str(estado) + "]" + "," + str(nodo.padre.id) + "," + accion + "," + str(nodo.profundidad) + "," + str(round(nodo.heuristica, 2)) + "," + str(round(nodo.valor, 2)) + "\n"
             except AttributeError:
                 accion = None
                 #[0][0.00,[(205,[1185,1252,1314])|bd1382],None,None,0,2191.98,2191.98]
-                cadena += "[" + str(nodo.id) + "]" + str(nodo.costo) + ",[" + nodo.estado.toString() + "|" + str(estado) + "],None,None," + str(nodo.profundidad) + "," + str(nodo.heuristica) + "," + str(nodo.valor) + "\n"
+                cadena += "[" + str(nodo.id) + "]" + str(round(nodo.costo, 2)) + ",[" + nodo.estado.toString() + "|" + str(estado) + "],None,None," + str(nodo.profundidad) + "," + str(round(nodo.heuristica, 2)) + "," + str(round(nodo.valor, 2)) + "\n"
         print(cadena)
 
     def toString(self):
-        return("[" + self.id) + "][" + self.costo + "," + self.estado.id + "," + self.padre.id + "," + self.accion + "," + self.profundidad + "," + self.heuristica + "," + self.valor + "]"
+        return "[" + str(self.id) + "][" + str(self.costo) + "," + str(self.padre.nodo_grafo.id) + "->" + str(self.nodo_grafo.id) + "," + str(self.padre.id) + "," + str(self.accion) + "," + str(self.profundidad) + "," + str(round(self.heuristica, 2)) + "," + str(round(self.valor, 2)) + "]"
 
 class estado:
 
@@ -132,9 +130,9 @@ def sucesor(nodo):
     global d1
     global arc_min_ec
     nodos = []
+    global a
     e = nodo.estado
-    if len(e.lista_objetivos) == 0: #Si no quedan nodos objetivos, se hace return
-        return
+    
     try:
         
         adyacentes = g.adyacencia.get(str(nodo.nodo_grafo.id)) #Recogemos los nodos adyacentes del nodo actual
@@ -143,24 +141,24 @@ def sucesor(nodo):
             n = g.lista_nodos.get(adyacente)
             n_arbol = nodo_arbol(n, nodo)
             
-            e2 = estado(e.lista_objetivos, n_arbol) # Creamos el siguiente estado, siendo el siguiente nodo, el nodo adyacente
-            n_arbol.estado = e2
+            if adyacente in e.lista_objetivos: # Si el adyacente esta en la lista de objetivos, le eliminamos de dicha lista
+                l = e.lista_objetivos.copy()
+                l.remove(adyacente)
+                e2 = estado(l, n_arbol)# Creamos el siguiente estado, siendo el siguiente nodo, el nodo adyacente
+            else:
+                e2 = estado(e.lista_objetivos, n_arbol) # Creamos el siguiente estado, siendo el siguiente nodo, el nodo adyacente
 
-            if n_arbol.nodo_grafo.id in n_arbol.estado.lista_objetivos: # Si el adyacente esta en la lista de objetivos, le eliminamos de dicha lista
-                l = n_arbol.estado.lista_objetivos.copy()
-                l.remove(n_arbol.nodo_grafo.id)
-                e2 = estado(l, n_arbol) # Creamos el siguiente estado, siendo el siguiente nodo, el nodo adyacente
-                n_arbol.estado = e2
+            n_arbol.estado = e2
 
             if estrategia == "A":
                 d2 = min_euclideo(n_arbol, e2.lista_objetivos)
                 if d1 <= d2:
-                    n_arbol.heuri((d1*len(e2.lista_objetivos))) 
+                    n_arbol.heuri(d1*len(e2.lista_objetivos)) 
                 else:
-                    n_arbol.heuri((d2*len(e2.lista_objetivos)))
+                    n_arbol.heuri(d2*len(e2.lista_objetivos))
             elif estrategia == "Ar":
                 n_arbol.heuri(arc_min_ec*len(e2.lista_objetivos)) 
-                              
+            
             nodos.append(n_arbol)
             #Siguiente adyacente
         
@@ -187,13 +185,14 @@ def algoritmoBusqueda(frontera, estados_visitados, maxdepth, estrategia):
 
         if (((nodo.profundidad <= maxdepth) or (maxdepth == -1)) & (nodo.estado.id not in estados_visitados)):
             estados_visitados.append(nodo.estado.id)
-            expandir(nodo)
+            expandir(nodo, frontera)
 
-def expandir(nodo):
+def expandir(nodo, frontera):
     nodos = sucesor(nodo)
     try:
-        for nodo in nodos:
-            insort(frontera, nodo, key=lambda x: (x.valor, x.nodo_grafo.id))
+        for nodo1 in nodos:
+            insort(frontera, nodo1, key=lambda x: (x.valor, x.nodo_grafo.id))
+            
     except TypeError:
         pass
 
@@ -208,12 +207,12 @@ def min_euclidea_objetivos(lista_n):
     return dist_min
 
 
-lista = ['1185', '1252', '1314']
-n = "205"
+lista = ['258', '298', '675', '785', '1294']
+n = "972"
 nodo = g.lista_nodos.get(n)
 arc_min_ec = 0
 nodo_arb = nodo_arbol(nodo, None)
-e = estado (lista, nodo_arb)
+e = estado(lista, nodo_arb)
 nodo_arb.estado = e
 
 if estrategia == "A":
