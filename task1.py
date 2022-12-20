@@ -20,24 +20,20 @@ class Nodes:
         self.longitude=""
         self.latitude=""
         self.ref=""
-        self.highway=""
-    
-    def coordenadas(self):
-        coor = (float(self.x), float(self.y))
-        return coor        
+        self.highway=""      
 
     def euclidea(self, n):
-        c1 = self.coordenadas()
-        c2 = n.coordenadas()
 
-        dist = math.sqrt(((c1[0] - c2[0])**2) + ((c1[1] - c2[1])**2))
+        dist = math.sqrt((float(self.x) - float(n.x))**2 + (float(self.y) - float(n.y))**2)
+        #math.sqrt((obj1.x - obj2.x)**2 + (obj1.y - obj2.y)**2)
         return dist
         
 class Edges:
 
-    def __init__( self,source,target ):
+    def __init__( self,source,target,id ):
         self.source= source  #source -> target
         self.target= target
+        self.id = id
         self.osmid=""       #different edge attributes d12-d27
         self.highway=""
         self.junction=""
@@ -72,7 +68,7 @@ class Handler(xml.sax.ContentHandler):
             self.node=Nodes(attrs["id"])
         
         elif tag=="edge":      #indicates which edge is being parsed
-            self.edge=Edges((attrs["source"]),(attrs["target"]))
+            self.edge=Edges((attrs["source"]),(attrs["target"]),(attrs["id"]))
 
         elif tag=="data":       #for parsing the data
             self.DataKey=attrs["key"]
@@ -145,6 +141,7 @@ class Handler(xml.sax.ContentHandler):
                 list_nodos[self.node.id] = a
 
         elif name=="edge":
+            
             graphCR.append(self.edge)
             a = []        #adding edges to the sorted list
             if self.edge.source in list_graph_CR:
