@@ -93,15 +93,12 @@ class nodo_arbol:
             try:
                 estado = nodo.estado.id[(len(nodo.estado.id) -6): len(nodo.estado.id)]
                 accion = "(" + str(nodo.padre.nodo_grafo.id) + "->" + str(nodo.nodo_grafo.id) + ")"
-                cadena += "[" + str(nodo.id) + "][" + str(round(nodo.costo, 2)) + "," + "[" + nodo.estado.toString() + "|" + str(estado) + "]" + "," + str(nodo.padre.id) + "," + accion + "," + str(nodo.profundidad) + "," + str(round(nodo.heuristica, 2)) + "," + str(round(nodo.valor, 2)) + "\n"
+                cadena += "[" + str(nodo.id) + "][" + str(round(nodo.costo, 2)) + "," + "[" + nodo.estado.toString() + "|" + str(estado) + "]" + "," + str(nodo.padre.id) + "," + accion + "," + str(nodo.profundidad) + "," + str(round(nodo.heuristica, 2)) + "," + str(round(nodo.valor, 2)) + "]\n"
             except AttributeError:
                 accion = None
                 #[0][0.00,[(205,[1185,1252,1314])|bd1382],None,None,0,2191.98,2191.98]
-                cadena += "[" + str(nodo.id) + "]" + str(round(nodo.costo, 2)) + ",[" + nodo.estado.toString() + "|" + str(estado) + "],None,None," + str(nodo.profundidad) + "," + str(round(nodo.heuristica, 2)) + "," + str(round(nodo.valor, 2)) + "\n"
+                cadena += "[" + str(nodo.id) + "]" + str(round(nodo.costo, 2)) + ",[" + nodo.estado.toString() + "|" + str(estado) + "],None,None," + str(nodo.profundidad) + "," + str(round(nodo.heuristica, 2)) + "," + str(round(nodo.valor, 2)) + "]\n"
         print(cadena)
-
-    def toString(self):
-        return "[" + str(self.id) + "][" + str(self.costo) + "," + str(self.padre.nodo_grafo.id) + "->" + str(self.nodo_grafo.id) + "," + str(self.padre.id) + "," + str(self.accion) + "," + str(self.profundidad) + "," + str(round(self.heuristica, 2)) + "," + str(round(self.valor, 2)) + "]"
 
 class estado:
 
@@ -112,15 +109,12 @@ class estado:
         self.cadena=self.cadena.replace(" ","")
         self.id = hashlib.md5(self.cadena.encode("utf-8")).hexdigest() #Montamos cadena encriptada en md5, que será el id del estado
 
-    def toString(self):
-        return self.cadena
-
 def min_euclideo(nodo, lista_objetivos):
     global g
     dist_min = float("inf")
     d = 0
-    for i in range(len(lista_objetivos)):
-        d = nodo.nodo_grafo.euclidea(g.lista_nodos.get(lista_objetivos[i]))
+    for objetivo in lista_objetivos:
+        d = nodo.nodo_grafo.euclidea(g.lista_nodos.get(objetivo))
         if d < dist_min:
             dist_min = d
     return dist_min
@@ -206,9 +200,8 @@ def min_euclidea_objetivos(lista_n):
                     dist_min = d
     return dist_min
 
-
-lista = ['258', '298', '675', '785', '1294']
-n = "972"
+lista = ['248', '528', '896', '1097']
+n = "37"
 nodo = g.lista_nodos.get(n)
 arc_min_ec = 0
 nodo_arb = nodo_arbol(nodo, None)

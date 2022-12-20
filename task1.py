@@ -25,7 +25,6 @@ class Nodes:
     def euclidea(self, n):
 
         dist = math.sqrt((float(self.x) - float(n.x))**2 + (float(self.y) - float(n.y))**2)
-        #math.sqrt((obj1.x - obj2.x)**2 + (obj1.y - obj2.y)**2)
         return dist
         
 class Edges:
