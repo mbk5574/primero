@@ -8,7 +8,7 @@ g.iniciar_grafo()
 lista_nodos = g.lista_nodos
 estados_visitados = []
 frontera = []
-estrategia = "A" #p= profundidad, a = anchura, c = coste uniforme
+estrategia = "" #p= profundidad, a = anchura, c = coste uniforme
 maxdepth = -1
 a = False
 for i in range(len(sys.argv)):
@@ -108,6 +108,9 @@ class estado:
         self.cadena = "(" + self.current_nodo.nodo_grafo.id + ",("+ str(self.lista_objetivos) + "))"
         self.cadena=self.cadena.replace(" ","")
         self.id = hashlib.md5(self.cadena.encode("utf-8")).hexdigest() #Montamos cadena encriptada en md5, que será el id del estado
+    
+    def toString(self):
+        return self.cadena
 
 def min_euclideo(nodo, lista_objetivos):
     global g
