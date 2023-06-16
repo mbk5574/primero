@@ -188,7 +188,7 @@ def expandir(nodo, frontera):
     nodos = sucesor(nodo)
     try:
         for nodo1 in nodos:
-            insort(frontera, nodo1, key=lambda x: (x.valor, x.nodo_grafo.id))
+            insort(frontera, nodo1, key=lambda x: (x.valor, x.id))
             
     except TypeError:
         pass
@@ -203,7 +203,7 @@ def min_euclidea_objetivos(lista_n):
                     dist_min = d
     return dist_min
 
-lista = ['248', '528', '896', '1097']
+lista = ['248', '528']
 n = "37"
 nodo = g.lista_nodos.get(n)
 arc_min_ec = 0
@@ -226,8 +226,8 @@ elif estrategia == "Ar":
         h = float(arista.length)
         if h < min_coste:
             min_coste = h
-    min_coste = round(min_coste, 2)
-    nodo_arb.heuri(min_coste)
+    min_coste = min_coste
+    nodo_arb.heuri(min_coste*len(lista))
     arc_min_ec = min_coste
 frontera.append(nodo_arb)
 
