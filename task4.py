@@ -127,7 +127,6 @@ def sucesor(nodo):
     global d1
     global arc_min_ec
     nodos = []
-    global a
     e = nodo.estado
     
     try:
@@ -170,12 +169,9 @@ def algoritmoBusqueda(frontera, estados_visitados, maxdepth, estrategia):
     
     while (len(frontera) != 0) and not solucion:
 
-        if estrategia == "p":
-            nodo = frontera.pop()
-        elif (estrategia == "c") or (estrategia == "A" or (estrategia == "a") or (estrategia == "Ar")):
-            nodo = frontera[0]
-            frontera.remove(frontera[0])
-        
+        nodo = frontera[0]
+        frontera.remove(frontera[0])
+    
         if len(nodo.estado.lista_objetivos) == 0:
             solucion = True
             nodo.obtener_camino()
@@ -203,8 +199,8 @@ def min_euclidea_objetivos(lista_n):
                     dist_min = d
     return dist_min
 
-lista = ['248', '528']
-n = "37"
+lista = ['242', '817', '915']
+n = "1163"
 nodo = g.lista_nodos.get(n)
 arc_min_ec = 0
 nodo_arb = nodo_arbol(nodo, None)
