@@ -191,8 +191,8 @@ if __name__ == "__main__":
             except (TypeError, ValueError):
                 raise ValueError("El número de maxdepth debe ser un entero mayor que 0")
 
-    lista = ['242', '817', '915']
-    n = "1163"
+    lista = ['249', '441', '528']
+    n = "1221"
     nodo = g.lista_nodos.get(n)
     arc_min_ec = 0
     nodo_arb = nodo_arbol(nodo, None)
