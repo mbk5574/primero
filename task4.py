@@ -4,31 +4,6 @@ import sys
 from bisect import insort
 import itertools
 
-g = task1.graph()
-g.iniciar_grafo()
-estados_visitados = []
-frontera = []
-estrategia = None #p= profundidad, a = anchura, c = coste uniforme
-maxdepth = -1
-
-options = {
-    "-c": "c",
-    "-p": "p",
-    "-a": "a",
-    "-A": "A",
-    "-Ar": "Ar"
-}
-for i in range(len(sys.argv)):
-    if sys.argv[i] in options:
-        estrategia = options[sys.argv[i]]
-    elif sys.argv[i] == "-m":
-        try:
-            maxdepth = int(sys.argv[i+1])
-        except IndexError:
-            raise IndexError("En la opción maxdepth \"-m\" debes proporcionar un número entero después")
-        except (TypeError, ValueError):
-            raise ValueError("El número de maxdepth debe ser un entero mayor que 0")
-
 class nodo_arbol:
     total_nodos = 0
 
@@ -109,13 +84,6 @@ class estado:
     def toString(self):
         return self.cadena
 
-
-def min_euclideo(nodo, lista_objetivos):
-    global g
-    if not lista_objetivos:
-        return 0  # O un valor adecuado según tus necesidades
-    return min(nodo.nodo_grafo.euclidea(g.lista_nodos.get(objetivo)) for objetivo in lista_objetivos)
-
 def sucesor(nodo):
     global g
     global d1
@@ -191,24 +159,56 @@ def min_euclidea_objetivos(lista_n):
             dist_min = d
     return dist_min
 
-lista = ['242', '817', '915']
-n = "1163"
-nodo = g.lista_nodos.get(n)
-arc_min_ec = 0
-nodo_arb = nodo_arbol(nodo, None)
-e = estado(lista, nodo_arb)
-nodo_arb.estado = e
+def min_euclideo(nodo, lista_objetivos):
+    global g
+    if not lista_objetivos:
+        return 0  # O un valor adecuado según tus necesidades
+    return min(nodo.nodo_grafo.euclidea(g.lista_nodos.get(objetivo)) for objetivo in lista_objetivos)
 
-if estrategia == "A":
-    lista_n = [g.lista_nodos.get(nodo) for nodo in lista]
-    d1 = min_euclidea_objetivos(lista_n)
-    nodo_arb.heuri(d1 * len(lista))
-elif estrategia == "Ar":
-    min_coste = min(float(arista.length) for arista in g.graf)
-    nodo_arb.heuri(min_coste * len(lista))
-    arc_min_ec = min_coste
-frontera.append(nodo_arb)
+if __name__ == "__main__":
+    g = task1.graph()
+    g.iniciar_grafo()
+    estados_visitados = []
+    frontera = []
+    estrategia = None
+    maxdepth = -1
 
-if not estrategia:
-    raise Exception("Seleccione una estrategia")
-algoritmoBusqueda(frontera, estados_visitados, maxdepth, estrategia)
+    options = {
+        "-c": "c",
+        "-p": "p",
+        "-a": "a",
+        "-A": "A",
+        "-Ar": "Ar"
+    }
+    for i in range(len(sys.argv)):
+        if sys.argv[i] in options:
+            estrategia = options[sys.argv[i]]
+        elif sys.argv[i] == "-m":
+            try:
+                maxdepth = int(sys.argv[i+1])
+            except IndexError:
+                raise IndexError("En la opción maxdepth \"-m\" debes proporcionar un número entero después")
+            except (TypeError, ValueError):
+                raise ValueError("El número de maxdepth debe ser un entero mayor que 0")
+
+    lista = ['242', '817', '915']
+    n = "1163"
+    nodo = g.lista_nodos.get(n)
+    arc_min_ec = 0
+    nodo_arb = nodo_arbol(nodo, None)
+    e = estado(lista, nodo_arb)
+    nodo_arb.estado = e
+
+    if estrategia == "A":
+        lista_n = [g.lista_nodos.get(nodo) for nodo in lista]
+        d1 = min_euclidea_objetivos(lista_n)
+        nodo_arb.heuri(d1 * len(lista))
+    elif estrategia == "Ar":
+        min_coste = min(float(arista.length) for arista in g.graf)
+        nodo_arb.heuri(min_coste * len(lista))
+        arc_min_ec = min_coste
+    frontera.append(nodo_arb)
+
+    if not estrategia:
+        raise Exception("Seleccione una estrategia")
+    algoritmoBusqueda(frontera, estados_visitados, maxdepth, estrategia)
